@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Lead Qualification & CRM Automation — Portfolio</title>
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --surface:#ffffff;
+    --surface-2:#fafbfc;
+    --border:#e2e5eb;
+    --text:#12151c;
+    --muted:#5b6472;
+    --dim:#8891a0;
+    --accent:#3452ff;
+    --accent-dark:#1f36c7;
+    --accent-soft:#eef1ff;
+    --green:#0f9d58;
+    --green-soft:#e7f6ee;
+    --amber:#b7791f;
+    --amber-soft:#fdf3e0;
+    --red:#c0392b;
+    --red-soft:#fbeae8;
+    --shadow:0 1px 2px rgba(16,20,30,.04),0 8px 24px -12px rgba(16,20,30,.12);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;display:flex;min-height:100vh;
+  }
+
+  /* ── Sidebar ─────────────────────────────────────────── */
+  .sidebar{
+    width:248px;flex:0 0 248px;background:#0d1220;color:#c6ccdb;
+    display:flex;flex-direction:column;padding:22px 16px;
+    position:sticky;top:0;height:100vh;
+  }
+  .brand{display:flex;align-items:center;gap:9px;padding:4px 8px 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px;}
+  .brand-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c8cff);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex:0 0 auto;}
+  .brand-name{font-weight:650;font-size:15px;color:#fff;letter-spacing:.2px;}
+  .brand-sub{font-size:10.5px;color:#7b8399;margin-top:1px;}
+  nav{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .nav-btn{display:flex;align-items:center;gap:10px;background:transparent;border:none;color:#aab2c5;font-family:var(--sans);font-size:13.5px;font-weight:500;padding:10px 12px;border-radius:9px;cursor:pointer;text-align:left;transition:background .12s ease,color .12s ease;}
+  .nav-btn .ic{width:17px;text-align:center;font-size:14px;opacity:.9;}
+  .nav-btn:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .nav-btn.active{background:var(--accent);color:#fff;}
+  .nav-btn.active .ic{opacity:1;}
+  .sidebar-foot{border-top:1px solid rgba(255,255,255,.08);padding-top:14px;margin-top:10px;font-size:10.5px;color:#6d7690;line-height:1.5;}
+  .sidebar-foot b{color:#9aa3ba;}
+
+  /* ── Main ────────────────────────────────────────────── */
+  main{flex:1;min-width:0;padding:26px 36px 36px;max-width:1520px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+  .topbar h1{font-size:21px;margin:0 0 3px;font-weight:650;letter-spacing:-.2px;}
+  .topbar p{margin:0;color:var(--muted);font-size:13px;}
+  .demo-note{display:inline-flex;align-items:center;gap:6px;background:var(--amber-soft);color:#8a5a12;border:1px solid #f0dcb0;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.15px;white-space:nowrap;}
+  .demo-note .dot{width:5px;height:5px;border-radius:50%;background:var(--amber);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+  h2.section-title{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:700;margin:0 0 12px;}
+
+  .grid{display:grid;gap:16px;}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:1fr 1fr;}
+  @media (max-width:980px){.grid-3{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow);}
+  .status-card .top-row{display:flex;align-items:flex-start;justify-content:space-between;}
+  .status-card .icon{font-size:19px;}
+  .status-card h3{font-size:13.5px;margin:12px 0 4px;font-weight:650;}
+  .status-card .stack{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;}
+  .pill{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;white-space:nowrap;}
+  .pill-live{background:var(--green-soft);color:var(--green);}
+  .pill-impl{background:#eef0f4;color:#4a5262;}
+  .pill-hot{background:var(--red-soft);color:var(--red);}
+  .pill-warm{background:var(--amber-soft);color:#8a5a12;}
+  .pill-low{background:#eef0f4;color:#4a5262;}
+  .pill-unq{background:#f1f2f5;color:#8891a0;}
+
+  .status-card-lg{border-left:3px solid var(--accent);padding:18px 20px 16px;}
+  .status-card-lg h3{font-size:15px;margin:12px 0 6px;}
+  .status-card-lg .card-desc{font-size:12px;color:#3a4152;line-height:1.55;margin:0 0 10px;}
+  .status-card-lg .stack{font-size:11px;}
+
+  .hero-title{font-size:17px;font-weight:700;margin:0 0 3px;letter-spacing:-.2px;}
+  .hero-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+  .value-line{font-size:14.5px;color:var(--accent-dark);font-weight:650;margin:10px 0 0;line-height:1.5;}
+  .flow-strip{margin-bottom:24px;}
+  .flow-row{display:grid;grid-template-columns:repeat(6, 1fr) ;gap:0;align-items:stretch;}
+  .flow-row.six{grid-template-columns:1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr;}
+  .flow-node{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 12px 12px;box-shadow:var(--shadow);min-width:0;position:relative;}
+  .flow-node .fn-step{position:absolute;top:-9px;left:12px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px var(--bg);}
+  .flow-node .fn-ic{font-size:17px;margin:2px 0 7px;}
+  .flow-node h4{font-size:12px;margin:0 0 4px;font-weight:650;line-height:1.3;}
+  .flow-node p{font-size:10.3px;color:var(--muted);margin:0;line-height:1.4;}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px;}
+  @media (max-width:1100px){.flow-row.six{grid-template-columns:1fr 1fr 1fr;gap:10px;}.flow-row.six .flow-arrow{display:none;}}
+  @media (max-width:640px){.flow-row.six{grid-template-columns:1fr;}}
+
+  .code-panel{background:#0d1220;color:#d6dcee;border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:11.8px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;box-shadow:var(--shadow);}
+  .panel-label{font-size:11px;color:var(--dim);font-weight:600;margin:0 0 8px;text-transform:uppercase;letter-spacing:.06em;}
+
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);}
+  .result-card .ic{font-size:16px;margin-bottom:8px;}
+  .result-card p{margin:0;font-size:13.5px;line-height:1.65;color:var(--text);font-weight:550;}
+
+  .kv-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .kv-table tr{border-bottom:1px solid var(--border);}
+  .kv-table tr:last-child{border-bottom:none;}
+  .kv-table td{padding:8px 4px;}
+  .kv-table td:first-child{color:var(--muted);width:44%;}
+  .kv-table td:last-child{font-weight:600;color:var(--text);}
+
+  .status-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  .status-list li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+  .status-list li .ok{color:var(--green);font-weight:700;}
+
+  /* ── Workflow stepper ────────────────────────────────── */
+  .stepper{position:relative;margin-top:6px;}
+  .step{display:flex;gap:16px;position:relative;padding-bottom:20px;}
+  .step:last-child{padding-bottom:0;}
+  .step::before{content:"";position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--border);}
+  .step:last-child::before{display:none;}
+  .step-num{flex:0 0 32px;height:32px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);color:var(--accent-dark);font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center;z-index:1;}
+  .step-body{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);}
+  .step-body .sh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .step-body h4{margin:0;font-size:13.5px;font-weight:650;}
+  .step-body p{margin:5px 0 0;font-size:12px;color:var(--muted);line-height:1.5;}
+  .step-body .tech{margin:6px 0 0;font-size:10.5px;color:var(--dim);font-family:var(--mono);}
+
+  /* ── Example lead ─────────────────────────────────────── */
+  .lead-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .lead-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--surface-2);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+  .lead-head .who{display:flex;align-items:center;gap:10px;}
+  .lead-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .lead-meta{font-size:11.5px;color:var(--muted);}
+  .lead-body{padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media (max-width:820px){.lead-body{grid-template-columns:1fr;}}
+  .lead-body h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:0 0 8px;}
+  .lead-message{font-size:12.8px;line-height:1.7;color:#333a48;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:0 0 12px;}
+
+  /* ── Pipeline (kanban) ────────────────────────────────── */
+  .kanban{display:grid;grid-template-columns:repeat(5, 1fr);gap:14px;align-items:start;}
+  @media (max-width:1200px){.kanban{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:640px){.kanban{grid-template-columns:1fr;}}
+  .kanban-col{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:120px;}
+  .kanban-col h5{margin:0 0 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);display:flex;align-items:center;justify-content:space-between;}
+  .kanban-count{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:1px 7px;font-size:10px;color:var(--muted);}
+  .kanban-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:8px;box-shadow:var(--shadow);}
+  .kanban-card b{display:block;font-size:12px;margin-bottom:2px;}
+  .kanban-card span{display:block;font-size:10.3px;color:var(--muted);}
+  .kanban-empty{font-size:11px;color:var(--dim);font-style:italic;padding:6px 2px;}
+
+  /* ── CRM table ────────────────────────────────────────── */
+  .filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .filter-btn{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  table.crm{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+  table.crm th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);background:var(--surface-2);padding:10px 14px;border-bottom:1px solid var(--border);}
+  table.crm td{padding:11px 14px;font-size:12.5px;border-bottom:1px solid var(--border);color:var(--text);}
+  table.crm tr:last-child td{border-bottom:none;}
+
+  /* ── Architecture ─────────────────────────────────────── */
+  .arch-card{padding:24px 26px 22px;}
+  .arch-layer{margin-bottom:20px;}
+  .arch-layer:last-child{margin-bottom:0;}
+  .arch-layer-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700;margin:0 0 10px;}
+  .arch-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
+  .arch-node{flex:1 1 140px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 12px;box-shadow:var(--shadow);text-align:center;}
+  .arch-node.accent{border-color:var(--accent);background:var(--accent-soft);}
+  .arch-node .an-ic{font-size:17px;margin-bottom:5px;}
+  .arch-node b{display:block;font-size:12.5px;}
+  .arch-node span{display:block;font-size:10px;color:var(--muted);margin-top:2px;}
+  .arch-down{text-align:center;color:var(--dim);font-size:16px;margin:6px 0;}
+  @media (max-width:760px){.arch-row{flex-direction:column;}}
+
+  .empty-state{padding:24px;text-align:center;color:var(--dim);font-size:12.5px;background:var(--surface-2);border:1px dashed var(--border);border-radius:10px;}
+
+  footer.note{margin-top:34px;font-size:11px;color:var(--dim);border-top:1px solid var(--border);padding-top:14px;}
+
+  /* ── Demo badge ───────────────────────────────────────── */
+  .screenshot-only{display:none;}
+
+  body.screenshot-mode .sidebar{display:none;}
+  body.screenshot-mode{align-items:stretch;}
+  body.screenshot-mode main{max-width:1760px;width:100%;margin:0 auto;padding:44px 60px;display:flex;flex-direction:column;justify-content:center;min-height:100vh;}
+  body.screenshot-mode .screenshot-only{display:block;}
+  body.screenshot-mode .hide-in-screenshot{display:none;}
+  body.screenshot-mode .topbar h1{font-size:28px;}
+  body.screenshot-mode .topbar p{font-size:14.5px;}
+  body.screenshot-mode .value-line{font-size:16px;}
+  body.screenshot-mode .hero-title{font-size:20px;margin-top:26px;}
+  body.screenshot-mode .hero-sub{font-size:13.5px;}
+  body.screenshot-mode .grid{gap:20px;}
+  body.screenshot-mode .flow-node{padding:22px 14px 16px;}
+  body.screenshot-mode .flow-node h4{font-size:13px;}
+  body.screenshot-mode .flow-node p{font-size:11px;}
+  body.screenshot-mode .flow-node .fn-ic{font-size:20px;}
+  body.screenshot-mode .status-card-lg{padding:24px 22px 20px;}
+  body.screenshot-mode .status-card-lg h3{font-size:18px;margin:14px 0 8px;}
+  body.screenshot-mode .status-card-lg .card-desc{font-size:13.5px;line-height:1.6;}
+  body.screenshot-mode .status-card-lg .stack{font-size:12px;}
+  body.screenshot-mode .arch-card{padding:32px 38px 30px;}
+  body.screenshot-mode .arch-node{padding:17px 13px;}
+  body.screenshot-mode .arch-node b{font-size:13.5px;}
+  body.screenshot-mode .arch-layer-title{font-size:12px;}
+  body.screenshot-mode .kv-table{font-size:14px;}
+  body.screenshot-mode .kv-table td{padding:10px 4px;}
+  body.screenshot-mode .lead-message{font-size:13.5px;}
+  body.screenshot-mode .result-card p{font-size:14.5px;}
+  body.screenshot-mode .step-body h4{font-size:14.5px;}
+  body.screenshot-mode .step-body p{font-size:12.5px;}
+
+  @media (max-width:760px){
+    body{flex-direction:column;}
+    .sidebar{width:100%;flex:0 0 auto;height:auto;position:relative;top:auto;padding:16px;}
+    nav{flex-direction:row;flex-wrap:wrap;gap:6px;}
+    .nav-btn{padding:8px 10px;font-size:12.5px;}
+    .sidebar-foot{margin-top:12px;padding-top:10px;}
+    main{padding:20px 16px 28px;max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<script>
+  (function(){
+    var p = new URLSearchParams(location.search);
+    if(p.get('mode') === 'screenshot' || p.get('screenshot') === '1'){
+      document.body.classList.add('screenshot-mode');
+    }
+  })();
+</script>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">L</div>
+      <div>
+        <div class="brand-name">Lead Automation</div>
+        <div class="brand-sub">Portfolio Case</div>
+      </div>
+    </div>
+    <nav id="nav">
+      <button class="nav-btn active" data-tab="overview"><span class="ic">▣</span> Overview</button>
+      <button class="nav-btn" data-tab="example"><span class="ic">✓</span> Example Lead</button>
+      <button class="nav-btn" data-tab="pipeline"><span class="ic">⇄</span> Lead Pipeline</button>
+      <button class="nav-btn" data-tab="crm"><span class="ic">▦</span> CRM</button>
+      <button class="nav-btn" data-tab="workflow"><span class="ic">⚙</span> Workflow</button>
+      <button class="nav-btn" data-tab="architecture"><span class="ic">▤</span> Architecture</button>
+    </nav>
+    <div class="sidebar-foot">
+      <b>Portfolio Case</b><br/>
+      Live local demo — data comes from a real API running on this machine.
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- TAB 1 — Overview -->
+    <section class="panel active" id="panel-overview">
+      <div class="topbar">
+        <div>
+          <h1>AI Lead Qualification &amp; CRM Automation</h1>
+          <p>From incoming inquiry to qualified sales opportunity</p>
+        </div>
+        <span class="demo-note"><span class="dot"></span> Portfolio case · demo data</span>
+      </div>
+      <p class="value-line">Automatically analyzes new leads, prioritizes opportunities and prepares the result for sales follow-up.</p>
+
+      <h2 class="hero-title">From Inquiry to Sales Handoff</h2>
+      <p class="hero-sub">Every lead moves through the same six-step pipeline before it reaches sales.</p>
+      <div class="flow-strip">
+        <div class="flow-row six">
+          <div class="flow-node"><div class="fn-step">1</div><div class="fn-ic">📥</div><h4>New Lead</h4><p>Received via webhook or the demo form.</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="fn-step">2</div><div class="fn-ic">✔️</div><h4>Validation</h4><p>Required fields and email format are checked.</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="fn-step">3</div><div class="fn-ic">🧠</div><h4>AI Analysis</h4><p>Produces intent, summary and a first qualification.</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="fn-step">4</div><div class="fn-ic">🎯</div><h4>Qualification</h4><p>Combined with business rules into a final category.</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="fn-step">5</div><div class="fn-ic">🗂️</div><h4>CRM</h4><p>Lead and result are stored as a CRM record.</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="fn-step">6</div><div class="fn-ic">📨</div><h4>Sales Handoff</h4><p>HOT and WARM leads are routed to sales.</p></div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Core Components</h2>
+      <div class="grid grid-3">
+        <div class="card status-card status-card-lg">
+          <div class="top-row"><span class="icon">🧠</span><span class="pill pill-live">Live</span></div>
+          <h3>AI Lead Analysis</h3>
+          <p class="card-desc">Analyzes the inquiry and produces a concise qualification summary.</p>
+          <p class="stack">Anthropic / OpenAI · deterministic fallback</p>
+        </div>
+        <div class="card status-card status-card-lg">
+          <div class="top-row"><span class="icon">🎯</span><span class="pill pill-impl">Implemented</span></div>
+          <h3>Qualification Workflow</h3>
+          <p class="card-desc">Assigns lead priority and routes the result according to defined business rules.</p>
+          <p class="stack">Python · FastAPI</p>
+        </div>
+        <div class="card status-card status-card-lg">
+          <div class="top-row"><span class="icon">🗂️</span><span class="pill pill-impl">Implemented</span></div>
+          <h3>CRM &amp; Sales Handoff</h3>
+          <p class="card-desc">Stores the processed lead and prepares the next action for the sales team.</p>
+          <p class="stack">SQLite · internal notification queue</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2 — Example Qualified Lead + AI Analysis -->
+    <section class="panel" id="panel-example">
+      <div class="topbar">
+        <div>
+          <h1>Example Qualified Lead</h1>
+          <p>Example of a lead automatically analyzed and qualified by the workflow</p>
+        </div>
+        <span class="demo-note"><span class="dot"></span> Demo data · No real customer information</span>
+      </div>
+      <div id="example-loading" class="empty-state">Loading live example from the API…</div>
+      <div id="example-content" style="display:none;">
+        <div class="lead-card">
+          <div class="lead-head">
+            <div class="who">
+              <div class="lead-avatar" id="ex-avatar">—</div>
+              <div>
+                <div style="font-weight:650;font-size:13.5px;" id="ex-company">— <span style="font-weight:500;color:var(--dim);">(Demo)</span></div>
+                <div class="lead-meta" id="ex-contact">—</div>
+              </div>
+            </div>
+            <div class="lead-meta" id="ex-meta">—</div>
+          </div>
+          <div class="lead-body">
+            <div>
+              <h4>Incoming Request</h4>
+              <div class="lead-message" id="ex-message">—</div>
+              <table class="kv-table">
+                <tr><td>Company size</td><td id="ex-size">—</td></tr>
+                <tr><td>Industry</td><td id="ex-industry">—</td></tr>
+                <tr><td>Estimated budget</td><td id="ex-budget">—</td></tr>
+                <tr><td>Timeline</td><td id="ex-timeline">—</td></tr>
+              </table>
+            </div>
+            <div>
+              <h4>AI Analysis</h4>
+              <table class="kv-table">
+                <tr><td>Qualification</td><td><span class="pill" id="ex-qualification-pill">—</span></td></tr>
+                <tr><td>Priority</td><td id="ex-priority">—</td></tr>
+                <tr><td>Intent</td><td id="ex-intent">—</td></tr>
+                <tr><td>Potential fit</td><td id="ex-fit">—</td></tr>
+                <tr><td>Urgency</td><td id="ex-urgency">—</td></tr>
+                <tr><td>Recommended action</td><td id="ex-action">—</td></tr>
+              </table>
+              <div class="result-card" style="margin-top:12px;"><div class="ic">🧩</div><p id="ex-summary">—</p></div>
+              <ul class="status-list">
+                <li><span class="ok">✓</span> Lead validated</li>
+                <li><span class="ok">✓</span> Duplicate check completed</li>
+                <li><span class="ok">✓</span> AI analysis completed</li>
+                <li><span class="ok">✓</span> CRM record created</li>
+                <li id="ex-handoff-line"><span class="ok">✓</span> Sales handoff generated</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3 — Lead Pipeline -->
+    <section class="panel" id="panel-pipeline">
+      <div class="topbar">
+        <div>
+          <h1>Lead Pipeline</h1>
+          <p>Live view of every demo lead currently in the system, grouped by stage</p>
+        </div>
+      </div>
+      <p class="hero-sub" style="margin-top:-8px;">This demo processes leads synchronously, so New / Processing empty out immediately — the columns still reflect the real pipeline stages.</p>
+      <div id="pipeline-content" class="kanban"></div>
+    </section>
+
+    <!-- TAB 4 — CRM -->
+    <section class="panel" id="panel-crm">
+      <div class="topbar">
+        <div>
+          <h1>CRM</h1>
+          <p>Every lead stored by the workflow, live from the database</p>
+        </div>
+      </div>
+      <div class="filter-row" id="crm-filters">
+        <button class="filter-btn active" data-filter="ALL">All</button>
+        <button class="filter-btn" data-filter="HOT">HOT</button>
+        <button class="filter-btn" data-filter="WARM">WARM</button>
+        <button class="filter-btn" data-filter="LOW_PRIORITY">LOW_PRIORITY</button>
+        <button class="filter-btn" data-filter="UNQUALIFIED">UNQUALIFIED</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="crm">
+          <thead>
+            <tr><th>Company</th><th>Contact</th><th>Qualification</th><th>Priority</th><th>Source</th><th>Status</th><th>Recommended Action</th></tr>
+          </thead>
+          <tbody id="crm-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 5 — Workflow -->
+    <section class="panel" id="panel-workflow">
+      <div class="topbar">
+        <div>
+          <h1>Automated Lead Workflow</h1>
+          <p>How a submitted lead becomes a qualified, CRM-tracked sales opportunity</p>
+        </div>
+      </div>
+      <div class="stepper">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="sh"><h4>Lead Received</h4><span class="pill pill-live">Live</span></div>
+          <p>A new inquiry arrives via the webhook API or the demo form.</p>
+          <p class="tech">POST /api/leads · FastAPI</p>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="sh"><h4>Validation</h4><span class="pill pill-live">Live</span></div>
+          <p>Required fields, email format and message content are checked and normalized.</p>
+          <p class="tech">validation.py</p>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="sh"><h4>Duplicate Check</h4><span class="pill pill-live">Live</span></div>
+          <p>The lead's email and phone are checked against existing CRM records.</p>
+          <p class="tech">duplicate_check.py · SQLite</p>
+        </div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <div class="sh"><h4>AI Analysis</h4><span class="pill pill-live">Live</span></div>
+          <p>Produces intent, a short summary and a first-pass qualification.</p>
+          <p class="tech">ai_analysis.py · Anthropic / OpenAI / fallback</p>
+        </div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body">
+          <div class="sh"><h4>Qualification</h4><span class="pill pill-live">Live</span></div>
+          <p>The AI result is combined with deterministic business signals into a final category.</p>
+          <p class="tech">qualification.py</p>
+        </div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body">
+          <div class="sh"><h4>CRM Update</h4><span class="pill pill-live">Live</span></div>
+          <p>The full lead record, including qualification and duplicate status, is stored.</p>
+          <p class="tech">db.py · SQLite</p>
+        </div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body">
+          <div class="sh"><h4>Sales Handoff</h4><span class="pill pill-live">Live</span></div>
+          <p>HOT and WARM leads generate a handoff record in the internal notification queue.</p>
+          <p class="tech">handoff.py · internal queue</p>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- TAB 6 — Architecture -->
+    <section class="panel" id="panel-architecture">
+      <div class="topbar">
+        <div>
+          <h1>System Architecture</h1>
+          <p>From inbound inquiry to CRM record and sales handoff, in four layers</p>
+        </div>
+      </div>
+      <div class="card arch-card">
+        <div class="arch-layer">
+          <p class="arch-layer-title">Layer 1 — Input</p>
+          <div class="arch-row">
+            <div class="arch-node"><div class="an-ic">🌐</div><b>Website Form</b><span>demo intake form</span></div>
+            <div class="arch-node accent"><div class="an-ic">🔗</div><b>Webhook / API</b><span>POST /api/leads</span></div>
+          </div>
+        </div>
+        <div class="arch-down">↓</div>
+        <div class="arch-layer">
+          <p class="arch-layer-title">Layer 2 — Workflow</p>
+          <div class="arch-row">
+            <div class="arch-node"><div class="an-ic">✔️</div><b>Validation</b><span>required fields, email</span></div>
+            <div class="arch-node"><div class="an-ic">🧬</div><b>Duplicate Check</b><span>email / phone match</span></div>
+            <div class="arch-node"><div class="an-ic">🧠</div><b>AI Analysis</b><span>intent, summary, first-pass</span></div>
+          </div>
+        </div>
+        <div class="arch-down">↓</div>
+        <div class="arch-layer">
+          <p class="arch-layer-title">Layer 3 — Business Logic</p>
+          <div class="arch-row">
+            <div class="arch-node"><div class="an-ic">🎯</div><b>Qualification</b><span>HOT / WARM / LOW / UNQUALIFIED</span></div>
+            <div class="arch-node"><div class="an-ic">📶</div><b>Priority</b><span>HIGH / MEDIUM / LOW</span></div>
+            <div class="arch-node"><div class="an-ic">➡️</div><b>Recommended Action</b><span>next concrete step</span></div>
+          </div>
+        </div>
+        <div class="arch-down">↓</div>
+        <div class="arch-layer">
+          <p class="arch-layer-title">Layer 4 — Output</p>
+          <div class="arch-row">
+            <div class="arch-node"><div class="an-ic">🗂️</div><b>CRM</b><span>SQLite record</span></div>
+            <div class="arch-node accent"><div class="an-ic">📨</div><b>Sales Handoff</b><span>internal notification queue</span></div>
+          </div>
+        </div>
+      </div>
+      <footer class="note">Python · FastAPI backend. No external CRM or messaging platform is connected in this demo — see README for what is real vs. demo vs. not connected.</footer>
+    </section>
+
+  </main>
+
+<script>
+  function activateTab(tab){
+    var btn = document.querySelector('.nav-btn[data-tab="' + tab + '"]');
+    var panel = document.getElementById('panel-' + tab);
+    if(!btn || !panel) return;
+    document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    panel.classList.add('active');
+  }
+  document.getElementById('nav').addEventListener('click', function(e){
+    var btn = e.target.closest('.nav-btn');
+    if(!btn) return;
+    activateTab(btn.dataset.tab);
+  });
+  if(location.hash){ activateTab(location.hash.slice(1)); }
+
+  async function fetchJSON(url){
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Request failed: ' + res.status);
+    return res.json();
+  }
+
+  function qualPillClass(q){
+    return {HOT:'pill-hot', WARM:'pill-warm', LOW_PRIORITY:'pill-low', UNQUALIFIED:'pill-unq'}[q] || 'pill-low';
+  }
+
+  // ── Example Qualified Lead (live) ──────────────────────────────────
+  async function loadExampleLead(){
+    try{
+      const leads = await fetchJSON('/api/leads');
+      const example = leads.find(l => (l.company || '').includes('Nordstern') && l.duplicate_status === 'NEW')
+                    || leads.find(l => l.qualification === 'HOT');
+      if(!example){
+        document.getElementById('example-loading').textContent = 'No processed leads yet — run scripts/seed_demo_leads.py first.';
+        return;
+      }
+      document.getElementById('ex-avatar').textContent = ((example.first_name||'')[0]||'') + ((example.last_name||'')[0]||'');
+      document.getElementById('ex-company').innerHTML = (example.company || '—') + ' <span style="font-weight:500;color:var(--dim);">(Demo)</span>';
+      document.getElementById('ex-contact').textContent = 'Contact: ' + (example.first_name||'') + ' ' + (example.last_name||'') + ' — Demo';
+      document.getElementById('ex-meta').textContent = 'Source: ' + (example.source||'—') + ' · Status: ' + example.status;
+      document.getElementById('ex-message').textContent = example.message || '—';
+      document.getElementById('ex-size').textContent = example.company_size || '—';
+      document.getElementById('ex-industry').textContent = example.industry || '—';
+      document.getElementById('ex-budget').textContent = example.estimated_budget || '—';
+      document.getElementById('ex-timeline').textContent = example.timeline || '—';
+      const pill = document.getElementById('ex-qualification-pill');
+      pill.textContent = example.qualification || '—';
+      pill.className = 'pill ' + qualPillClass(example.qualification);
+      document.getElementById('ex-priority').textContent = example.priority || '—';
+      document.getElementById('ex-intent').textContent = example.intent || '—';
+      document.getElementById('ex-fit').textContent = example.potential_fit || '—';
+      document.getElementById('ex-urgency').textContent = example.urgency || '—';
+      document.getElementById('ex-action').textContent = example.recommended_action || '—';
+      document.getElementById('ex-summary').textContent = example.ai_summary || '—';
+      if(!(example.qualification === 'HOT' || example.qualification === 'WARM')){
+        document.getElementById('ex-handoff-line').style.display = 'none';
+      }
+      document.getElementById('example-loading').style.display = 'none';
+      document.getElementById('example-content').style.display = 'block';
+    }catch(err){
+      document.getElementById('example-loading').textContent = 'Could not reach the API — start the server to load a live example (see README).';
+    }
+  }
+
+  // ── Lead Pipeline (live kanban) ─────────────────────────────────────
+  function pipelineColumn(lead){
+    if(lead.status === 'VALIDATION_FAILED' || lead.status === 'MANUAL_REVIEW') return 'Manual Review';
+    if(lead.status !== 'COMPLETED') return 'Processing';
+    if(lead.qualification === 'HOT' || lead.qualification === 'WARM') return 'Sales Follow-Up';
+    return 'Qualified';
+  }
+
+  async function loadPipeline(){
+    const container = document.getElementById('pipeline-content');
+    const columns = ['New', 'Processing', 'Qualified', 'Sales Follow-Up', 'Manual Review'];
+    try{
+      const leads = await fetchJSON('/api/leads');
+      const grouped = {}; columns.forEach(c => grouped[c] = []);
+      leads.forEach(l => grouped[pipelineColumn(l)].push(l));
+      container.innerHTML = columns.map(col => `
+        <div class="kanban-col">
+          <h5>${col} <span class="kanban-count">${grouped[col].length}</span></h5>
+          ${grouped[col].length ? grouped[col].map(l => `
+            <div class="kanban-card">
+              <b>${l.company || (l.first_name + ' ' + l.last_name) || l.lead_id}</b>
+              <span>${l.qualification || l.status}${l.priority ? ' · ' + l.priority : ''}</span>
+            </div>`).join('') : '<div class="kanban-empty">No leads in this stage right now.</div>'}
+        </div>`).join('');
+    }catch(err){
+      container.innerHTML = '<div class="empty-state">Could not reach the API — start the server to load the live pipeline (see README).</div>';
+    }
+  }
+
+  // ── CRM table (live) ────────────────────────────────────────────────
+  let allLeads = [];
+  function renderCrmRows(filter){
+    const rows = allLeads.filter(l => filter === 'ALL' || l.qualification === filter);
+    const tbody = document.getElementById('crm-rows');
+    if(!rows.length){
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--dim);">No leads for this filter.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(l => `
+      <tr>
+        <td>${l.company || '—'}</td>
+        <td>${(l.first_name||'') + ' ' + (l.last_name||'')}</td>
+        <td>${l.qualification ? `<span class="pill ${qualPillClass(l.qualification)}">${l.qualification}</span>` : '—'}</td>
+        <td>${l.priority || '—'}</td>
+        <td>${l.source || '—'}</td>
+        <td>${l.status}</td>
+        <td>${l.recommended_action || '—'}</td>
+      </tr>`).join('');
+  }
+
+  async function loadCrm(){
+    try{
+      allLeads = await fetchJSON('/api/leads');
+      renderCrmRows('ALL');
+    }catch(err){
+      document.getElementById('crm-rows').innerHTML =
+        '<tr><td colspan="7" style="text-align:center;color:var(--dim);">Could not reach the API — start the server to load live CRM data (see README).</td></tr>';
+    }
+  }
+  document.getElementById('crm-filters').addEventListener('click', function(e){
+    const btn = e.target.closest('.filter-btn');
+    if(!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCrmRows(btn.dataset.filter);
+  });
+
+  loadExampleLead();
+  loadPipeline();
+  loadCrm();
+</script>
+</body>
+</html>

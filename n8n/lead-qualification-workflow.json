@@ -1,0 +1,93 @@
+{
+  "name": "AI Lead Qualification & CRM Automation",
+  "meta": {
+    "note": "PREPARED, NOT EXECUTED. No local n8n instance was available in the environment this project was built in (no Docker, no global n8n install). This workflow is provided as an importable, working n8n definition that forwards an incoming lead to the same Python/FastAPI pipeline (validation, duplicate check, AI analysis, qualification, CRM, sales handoff) used by the actually-running demo. Import it into a real n8n instance to execute it live; nothing in this file has been run."
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-intake",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-lead-intake",
+      "name": "Lead Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8010/api/leads",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "http-forward-to-pipeline",
+      "name": "Run Lead Qualification Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "notes": "Forwards the raw lead to the FastAPI backend, which performs validation, duplicate check, AI analysis, qualification and CRM storage."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "cond-hot-or-warm",
+              "leftValue": "={{ $json.qualification }}",
+              "rightValue": "HOT",
+              "operator": {"type": "string", "operation": "equals"}
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "if-hot-or-warm",
+      "name": "Is HOT or WARM?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 300],
+      "notes": "Add a second OR condition for qualification == WARM in the n8n UI after import."
+    },
+    {
+      "parameters": {},
+      "id": "noop-sales-notification",
+      "name": "Sales Notification (not connected)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [960, 200],
+      "notes": "Placeholder for a real Slack/Email node. No messaging credentials are configured in this project — wire this up to an actual Slack or Gmail node before using in production."
+    },
+    {
+      "parameters": {},
+      "id": "noop-no-action",
+      "name": "No Further Action",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [960, 400]
+    }
+  ],
+  "connections": {
+    "Lead Intake Webhook": {
+      "main": [[{"node": "Run Lead Qualification Pipeline", "type": "main", "index": 0}]]
+    },
+    "Run Lead Qualification Pipeline": {
+      "main": [[{"node": "Is HOT or WARM?", "type": "main", "index": 0}]]
+    },
+    "Is HOT or WARM?": {
+      "main": [
+        [{"node": "Sales Notification (not connected)", "type": "main", "index": 0}],
+        [{"node": "No Further Action", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"}
+}

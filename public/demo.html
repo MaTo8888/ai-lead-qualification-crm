@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Submit Demo Lead — AI Lead Qualification</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --surface:#fff; --border:#e2e5eb; --text:#12151c; --muted:#5b6472;
+    --accent:#3452ff; --accent-dark:#1f36c7; --accent-soft:#eef1ff;
+    --green:#0f9d58; --green-soft:#e7f6ee; --red:#c0392b; --red-soft:#fbeae8;
+    --amber:#b7791f; --amber-soft:#fdf3e0;
+    --shadow:0 1px 2px rgba(16,20,30,.04),0 8px 24px -12px rgba(16,20,30,.12);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);padding:40px 20px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
+  .note{display:inline-flex;gap:6px;align-items:center;background:var(--amber-soft);color:#8a5a12;border:1px solid #f0dcb0;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:600;margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media (max-width:800px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:var(--shadow);}
+  label{display:block;font-size:12px;font-weight:650;color:var(--muted);margin:14px 0 5px;}
+  label:first-child{margin-top:0;}
+  input, textarea, select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:13.5px;background:#fafbfc;}
+  textarea{min-height:90px;resize:vertical;}
+  button{margin-top:18px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:650;cursor:pointer;}
+  button:hover{background:var(--accent-dark);}
+  button:disabled{opacity:.6;cursor:default;}
+  .result{font-size:13px;}
+  .placeholder{color:var(--muted);font-size:13px;}
+  .pill{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;padding:3px 9px;border-radius:6px;margin-bottom:10px;}
+  .pill-hot{background:var(--red-soft);color:var(--red);}
+  .pill-warm{background:var(--amber-soft);color:#8a5a12;}
+  .pill-low{background:#eef0f4;color:#4a5262;}
+  .pill-unq{background:#f1f2f5;color:#8891a0;}
+  .pill-fail{background:var(--red-soft);color:var(--red);}
+  .kv{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
+  .kv td{padding:6px 4px;border-bottom:1px solid var(--border);}
+  .kv td:first-child{color:var(--muted);width:42%;}
+  .errors{margin:8px 0 0;padding-left:18px;color:var(--red);font-size:12.5px;}
+  a{color:var(--accent-dark);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Submit Demo Lead</h1>
+  <p class="sub">Submits a real inquiry through the live pipeline: validation → duplicate check → AI analysis → qualification → CRM → sales handoff.</p>
+  <div class="note">Demo form · anything you submit here is stored as a demo lead, not sent to a real business.</div>
+
+  <div class="grid">
+    <div class="card">
+      <form id="lead-form">
+        <label>First name</label><input name="first_name" />
+        <label>Last name</label><input name="last_name" />
+        <label>Company</label><input name="company" />
+        <label>Email *</label><input name="email" type="email" required />
+        <label>Phone</label><input name="phone" />
+        <label>Industry</label><input name="industry" />
+        <label>Company size</label><input name="company_size" placeholder="e.g. 25 employees" />
+        <label>Message *</label><textarea name="message" required placeholder="What do you need help with?"></textarea>
+        <label>Estimated budget</label><input name="estimated_budget" placeholder="e.g. 5000-10000 EUR" />
+        <label>Timeline</label><input name="timeline" placeholder="e.g. urgent, this week" />
+        <button type="submit" id="submit-btn">Submit lead</button>
+      </form>
+    </div>
+    <div class="card">
+      <div id="result" class="result"><p class="placeholder">Submit the form to see the live pipeline result here — validation, qualification and CRM status, exactly as produced by the API.</p></div>
+    </div>
+  </div>
+
+  <p style="margin-top:28px;"><a href="/portfolio/index.html">← Back to portfolio dashboard</a></p>
+</div>
+
+<script>
+  function qualPillClass(q){
+    return {HOT:'pill-hot', WARM:'pill-warm', LOW_PRIORITY:'pill-low', UNQUALIFIED:'pill-unq'}[q] || 'pill-low';
+  }
+
+  document.getElementById('lead-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const resultEl = document.getElementById('result');
+    btn.disabled = true; btn.textContent = 'Processing…';
+
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try{
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+      });
+      const lead = await res.json();
+
+      if(lead.status === 'VALIDATION_FAILED'){
+        resultEl.innerHTML = `
+          <span class="pill pill-fail">Validation failed</span>
+          <p>The lead could not be processed:</p>
+          <ul class="errors">${(lead.validation_errors||[]).map(er => `<li>${er}</li>`).join('')}</ul>`;
+      } else {
+        resultEl.innerHTML = `
+          <span class="pill ${qualPillClass(lead.qualification)}">${lead.qualification || lead.status}</span>
+          <table class="kv">
+            <tr><td>Lead ID</td><td>${lead.lead_id}</td></tr>
+            <tr><td>Status</td><td>${lead.status}</td></tr>
+            <tr><td>Duplicate check</td><td>${lead.duplicate_status}</td></tr>
+            <tr><td>Priority</td><td>${lead.priority || '—'}</td></tr>
+            <tr><td>Intent</td><td>${lead.intent || '—'}</td></tr>
+            <tr><td>Recommended action</td><td>${lead.recommended_action || '—'}</td></tr>
+            <tr><td>Analysis mode</td><td>${lead.analysis_mode || '—'}</td></tr>
+          </table>
+          <p style="margin-top:10px;"><b>AI summary:</b> ${lead.ai_summary || '—'}</p>`;
+      }
+    }catch(err){
+      resultEl.innerHTML = '<p style="color:var(--red);">Could not reach the API. Is the server running?</p>';
+    }finally{
+      btn.disabled = false; btn.textContent = 'Submit lead';
+    }
+  });
+</script>
+</body>
+</html>
